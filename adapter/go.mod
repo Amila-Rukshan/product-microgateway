@@ -3,6 +3,7 @@ module github.com/wso2/product-microgateway/adapter
 go 1.15
 
 require (
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.20.0
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus v0.3.2
 	github.com/envoyproxy/go-control-plane v0.10.0
 	github.com/envoyproxy/protoc-gen-validate v0.4.1 // indirect
