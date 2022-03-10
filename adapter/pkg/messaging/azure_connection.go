@@ -24,6 +24,7 @@ import (
 	"strconv"
 	"time"
 
+	azlog "github.com/Azure/azure-sdk-for-go/sdk/azcore/log"
 	asb "github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus/admin"
 	"github.com/google/uuid"
@@ -98,8 +99,28 @@ func InitiateBrokerConnectionAndValidate(connectionString string, componentName 
 	return subscriptionMetaDataList, err
 }
 
+func enableASBDebugging() {
+	azlog.SetEvents(
+		// connection/reconnect related events)
+		"azsb.Conn",
+		// authentication events
+		"azsb.Auth",
+		// receiver specific events
+		"azsb.Receiver",
+		// management link related events
+		"azsb.Mgmt",
+		// retry related events
+		"azsb.Retry",
+	)
+
+	azlog.SetListener(func(event azlog.Event, s string) {
+		logger.LoggerMsg.Debugf("[%s] %s\n", event, s)
+	})
+}
+
 // InitiateConsumers to pass event consumption
 func InitiateConsumers(connectionString string, subscriptionMetaDataList []Subscription, reconnectInterval time.Duration) {
+	enableASBDebugging()
 	for _, subscriptionMetaData := range subscriptionMetaDataList {
 		go func(subscriptionMetaData Subscription) {
 			startBrokerConsumer(connectionString, subscriptionMetaData, reconnectInterval)
